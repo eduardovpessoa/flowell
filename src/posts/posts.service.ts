@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/users.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './create-post.dto';
 import { Post } from './post.entity';
@@ -11,15 +12,19 @@ export class PostsService {
     private postsRepository: Repository<Post>,
   ) {}
 
-  findAll(user : any): Promise<Post[]> {
-    return this.postsRepository.find();
+  findOne(id : number): Promise<Post | null> {
+    return this.postsRepository.findOne({ where: {id}, relations: ['user'] });
   }
 
-  async inactivate(id: number, user : any): Promise<void> {
-    await this.postsRepository.update(id, {isActive: false});
+  findAll(user : User): Promise<Post[]> {
+    return this.postsRepository.findBy({ user });
   }
 
-  async create(user : any, createPostDto: CreatePostDto): Promise<void> {
+  async inactivate(post : Post): Promise<void> {
+    await this.postsRepository.save(post);
+  }
+
+  async create(user : User, createPostDto: CreatePostDto): Promise<void> {
     const post = new Post();
     post.title = createPostDto.title;
     post.text = createPostDto.text;

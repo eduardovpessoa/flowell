@@ -29,7 +29,7 @@ export class UsersService {
     return this.usersRepository.findOneBy({ username });
   }
 
-  async inactivate(id: number): Promise<void> {
+  async inactivate(id: string): Promise<void> {
     await this.usersRepository.update(id, {isActive: false});
   }
 

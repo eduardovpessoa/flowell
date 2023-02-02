@@ -1,4 +1,4 @@
-import { Module, Post } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './users/users.entity';
 import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
+import { Post } from './posts/post.entity';
 
 @Module({
   imports: [

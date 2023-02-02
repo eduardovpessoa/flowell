@@ -1,5 +1,6 @@
-import { Module, Post } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Post } from './post.entity';
 import { PostsService } from './posts.service';
 
 @Module({

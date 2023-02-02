@@ -27,27 +27,39 @@ export class AppController {
 
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@Request() req, @Response() res) {
+    const token = await this.authService.login(req.user);
+    return res.status(HttpStatus.OK).json(token);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('posts')
+  @Get('feed')
   async listPosts(@Request() req, @Response() res) {
-    const posts = await this.postService.findAll(req.user);
+    const user = await this.userService.findOne(req.user.userId);
+    const posts = await this.postService.findAll(user);
     return res.status(HttpStatus.OK).json(posts);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('posts')
   async createPost(@Request() req, @Body(new ValidationPipe({ transform: true })) createPostDto: CreatePostDto) {
-    return this.postService.create(req.user, createPostDto);
+    const user = await this.userService.findOne(req.user.userId);
+    return this.postService.create(user, createPostDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('posts/:id')
   async deletePost(@Param('id') id: number, @Request() req, @Response() res) {
-    return this.postService.inactivate(id, req.user);
+    const post = await this.postService.findOne(id);
+    if(post == null){
+      return res.status(HttpStatus.NOT_FOUND);
+    }
+    if(post.user.id === req.user.userId){
+      post.isActive = false;
+      return this.postService.inactivate(post);
+    }else{
+      return res.status(HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @UseGuards(JwtAuthGuard)
